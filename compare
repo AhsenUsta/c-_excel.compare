@@ -1,0 +1,71 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
+using Microsoft.Office.Interop.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
+namespace deneme
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            
+            Excel.Application xapp = new Microsoft.Office.Interop.Excel.Application();
+             Excel.Workbook xworkbook;
+            Excel.Worksheet xworksheet;
+            Excel.Range range;
+            object misvalue = System.Reflection.Missing.Value;
+
+            xworkbook = xapp.Workbooks.Open(@"C:/Users/AHSENUSTA/Desktop/b1.xlsx", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+            xworksheet = (Excel.Worksheet)xworkbook.Worksheets.get_Item(1);
+
+            range = xworksheet.UsedRange;
+
+            Excel.Application xapp2 = new Microsoft.Office.Interop.Excel.Application();
+            Excel.Workbook yworkbook;
+            Excel.Worksheet yworksheet;
+            Excel.Range range2;
+            yworkbook = xapp2.Workbooks.Open(@"C:/Users/AHSENUSTA/Desktop/b2.xlsx",0,true,5,"","",true,Microsoft.Office.Interop.Excel.XlPlatform.xlWindows,"\t",false,false,0,true,1,0);
+            yworksheet = (Excel.Worksheet)yworkbook.Worksheets.get_Item(1);
+
+            range2 = yworksheet.UsedRange;
+            Excel.Application outexcel=new Microsoft.Office.Interop.Excel.Application();
+            Excel.Workbook outwork;
+            Excel.Worksheet outsheet;
+            object misValue=System.Reflection.Missing.Value;
+            outwork = outexcel.Workbooks.Add(misValue);
+            outsheet = (Excel.Worksheet)outwork.Worksheets.get_Item(1);
+            string str1, str2;
+            int row = 0;
+            int column = 0;
+        
+            for (row = 1; row <= range.Rows.Count ; row++)
+            {
+                for (column = 1; column <= range.Columns.Count; column++)
+                { 
+                    str1= (range.Cells[row,column] as Excel.Range).Value2.ToString();
+                    str2=(range2.Cells[row,column] as Excel.Range).Value2.ToString();
+                 
+                    if (!str1.Equals(str2))
+                    {
+                        outsheet.Cells[row, column] = str1 + "\n" + str2;
+                        outsheet.Cells[row, column].Interior.Color = XlRgbColor.rgbRed;
+                    }
+                    else
+                    { 
+                      outsheet.Cells[row,column]=str1;
+                      outsheet.Cells[row, column].Interior.Color = XlRgbColor.rgbGreen;
+                    }
+                }
+            }
+
+            outwork.SaveAs("out1.xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+            outwork.Close(true, misValue, misValue);
+            xapp2.Quit();
+        }
+    }
+}
